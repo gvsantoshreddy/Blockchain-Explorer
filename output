@@ -1,0 +1,36 @@
+User Alice added successfully.
+User Bob added successfully.
+User Charlie added successfully.
+User David added successfully.
+Transaction added: Alice -> Bob
+Transaction added: Bob -> Charlie
+Transaction added: Charlie -> David
+
+Transaction Graph:
+
+         Alice     Bob Charlie   David
+   Alice       0       1       0       0
+     Bob       0       0       1       0
+ Charlie       0       0       0       1
+   David       0       0       0       0
+Transaction updated successfully.
+
+Transaction Graph:
+
+         Alice     Bob Charlie   David
+   Alice       0       1       0       0
+     Bob       0       0       0       1
+ Charlie       0       0       0       1
+   David       0       0       0       0
+Transaction deleted successfully.
+
+Transaction Graph:
+
+         Alice     Bob Charlie   David
+   Alice       0       0       0       0
+     Bob       0       0       0       1
+ Charlie       0       0       0       1
+   David       0       0       0       0
+
+
+=== Code Execution Successful ===
