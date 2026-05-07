@@ -1,65 +1,138 @@
-# Blockchain-Explorer
 #include <stdio.h>
 #include <string.h>
 
-#define MAX 10
+#define MAX 20
 
-char graph[MAX][MAX][20];
-char nodes[MAX][20];
-int size = 0;
 
-// find index
-int getIndex(char name[]) {
-    for(int i=0;i<size;i++) {
-        if(strcmp(nodes[i], name)==0)
+char users[MAX][20];
+int graph[MAX][MAX];
+int totalUsers = 0;
+
+
+int getUserIndex(char name[]) {
+    for (int i = 0; i < totalUsers; i++) {
+        if (strcmp(users[i], name) == 0) {
             return i;
+        }
     }
     return -1;
 }
 
-// add node
-int addNode(char name[]) {
-    int idx = getIndex(name);
-    if(idx != -1) return idx;
 
-    strcpy(nodes[size], name);
-    return size++;
-}
-
-// CREATE
-void addTransaction(char tx[], char input[], char outputs[][20], int n) {
-    int i = addNode(input);
-    int t = addNode(tx);
-
-    strcpy(graph[i][0], tx);
-
-    for(int j=0;j<n;j++) {
-        int o = addNode(outputs[j]);
-        strcpy(graph[t][j], outputs[j]);
+void createUser(char name[]) {
+    if (getUserIndex(name) != -1) {
+        printf("User already exists!\n");
+        return;
     }
+
+    strcpy(users[totalUsers], name);
+
+    for (int i = 0; i <= totalUsers; i++) {
+        graph[totalUsers][i] = 0;
+        graph[i][totalUsers] = 0;
+    }
+
+    totalUsers++;
+    printf("User %s added successfully.\n", name);
 }
 
-// READ
-void display() {
-    for(int i=0;i<size;i++) {
-        printf("%s -> ", nodes[i]);
-        for(int j=0;j<MAX && strlen(graph[i][j])>0;j++) {
-            printf("%s ", graph[i][j]);
+
+void addTransaction(char sender[], char receiver[]) {
+    int s = getUserIndex(sender);
+    int r = getUserIndex(receiver);
+
+    if (s == -1 || r == -1) {
+        printf("Invalid users!\n");
+        return;
+    }
+
+    graph[s][r] = 1;
+
+    printf("Transaction added: %s -> %s\n", sender, receiver);
+}
+
+
+void displayGraph() {
+    printf("\nTransaction Graph:\n\n");
+
+    printf("      ");
+    for (int i = 0; i < totalUsers; i++) {
+        printf("%8s", users[i]);
+    }
+    printf("\n");
+
+    for (int i = 0; i < totalUsers; i++) {
+        printf("%8s", users[i]);
+
+        for (int j = 0; j < totalUsers; j++) {
+            printf("%8d", graph[i][j]);
         }
         printf("\n");
     }
 }
 
-// MAIN
+
+void updateTransaction(char sender[], char oldReceiver[], char newReceiver[]) {
+    int s = getUserIndex(sender);
+    int oldR = getUserIndex(oldReceiver);
+    int newR = getUserIndex(newReceiver);
+
+    if (s == -1 || oldR == -1 || newR == -1) {
+        printf("Invalid users!\n");
+        return;
+    }
+
+    if (graph[s][oldR] == 0) {
+        printf("Old transaction does not exist!\n");
+        return;
+    }
+
+    graph[s][oldR] = 0;
+    graph[s][newR] = 1;
+
+    printf("Transaction updated successfully.\n");
+}
+
+
+void deleteTransaction(char sender[], char receiver[]) {
+    int s = getUserIndex(sender);
+    int r = getUserIndex(receiver);
+
+    if (s == -1 || r == -1) {
+        printf("Invalid users!\n");
+        return;
+    }
+
+    if (graph[s][r] == 0) {
+        printf("Transaction does not exist!\n");
+        return;
+    }
+
+    graph[s][r] = 0;
+
+    printf("Transaction deleted successfully.\n");
+}
+
 int main() {
 
-    char out1[][20] = {"B","C"};
-    char out2[][20] = {"D"};
+    createUser("Alice");
+    createUser("Bob");
+    createUser("Charlie");
+    createUser("David");
 
-    addTransaction("tx1","A",out1,2);
-    addTransaction("tx2","B",out2,1);
+    addTransaction("Alice", "Bob");
+    addTransaction("Bob", "Charlie");
+    addTransaction("Charlie", "David");
 
-    display();
+    displayGraph();
+
+    updateTransaction("Bob", "Charlie", "David");
+
+    displayGraph();
+    
+    deleteTransaction("Alice", "Bob");
+
+    displayGraph();
 
     return 0;
 }
